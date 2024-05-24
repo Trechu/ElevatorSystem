@@ -43,7 +43,6 @@ class ElevatorSystem {
                 await simulate_movement(2000);
                 elevator.current_floor += 1;
             }
-            console.log("On floor " +elevator.current_floor);    
         }
         elevator_arrived(elevator, elevator.current_floor);
         elevator.destination = -1;

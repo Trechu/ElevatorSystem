@@ -13,6 +13,15 @@
 
 .floor-section {
     height: 95px;
+    padding: 10px;
+    border-style: ridge;
+    border-left: 0px;
+    border-right: 0px;
+}
+
+.elevator {
+    height: 95px;
+    padding: 10px;
 }
 
 .elevator-container {
