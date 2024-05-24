@@ -33,7 +33,6 @@ class ElevatorSystem {
     }
 
     async dispatch_elevator(elevator){
-        // console.log("The elevator " + elevator.id  + " is now moving to floor " + elevator.destination);
         let starting_point = elevator.current_floor;
         let direction = starting_point - elevator.destination;
         for(let i = 0; i < Math.abs(starting_point - elevator.destination); i++){
