@@ -26,7 +26,6 @@ class ElevatorSystem {
             }
             available_elevators.delete(best_elevator);
             best_elevator.destination = floor_number;
-            console.log(best_elevator)
             this.dispatch_elevator(best_elevator);
         } else {
             // Do something while waiting for elevators
@@ -35,11 +34,38 @@ class ElevatorSystem {
 
     async dispatch_elevator(elevator){
         // console.log("The elevator " + elevator.id  + " is now moving to floor " + elevator.destination);
-        setTimeout(() => {
-            elevator.current_floor = elevator.destination;
-            elevator.destination = -1;
-            elevator_arrived(elevator, elevator.current_floor);
-        }, 3000);
+        let starting_point = elevator.current_floor;
+        let direction = starting_point - elevator.destination;
+        for(let i = 0; i < Math.abs(starting_point - elevator.destination); i++){
+            if(direction > 0){
+                await simulate_movement(2000);
+                elevator.current_floor -= 1;
+            } else if (direction < 0){
+                await simulate_movement(2000);
+                elevator.current_floor += 1;
+            }
+            console.log("On floor " +elevator.current_floor);    
+        }
+        elevator_arrived(elevator, elevator.current_floor);
+        elevator.destination = -1;
+    }
+
+    status(){
+        // This is a pretty version :)
+
+        // for(const elevator of elevator_array){
+        //     if(elevator.destination == -1){
+        //         console.log("Elevator " + elevator.id + " on standby."); 
+        //     } else {
+        //         console.log("Elevator " + elevator.id + " moving to floor " + elevator.destination); 
+        //     }
+        // }
+
+        let elevator_status = [];
+        for(const elevator of elevator_array){
+            elevator_status.push([elevator.id, elevator.current_floor, elevator.destination]);
+        }
+        return elevator_status;
     }
 }
 
@@ -88,6 +114,10 @@ function elevator_arrived(elevator, floor){
     available_elevators.set(elevator, floor);
 }
 
+function simulate_movement(ms = 0) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}  
+
 const elevator_array = [];
 
 const available_elevators = new Map();
@@ -100,9 +130,3 @@ for(let i = 0; i < elevator_count; i++){
 }
 
 const main_system = new ElevatorSystem();
-
-console.log([...available_elevators.entries()]);
-main_system.pickup(3,1);
-setTimeout(() => {
-    console.log([...available_elevators.entries()]);
-}, 5000)
