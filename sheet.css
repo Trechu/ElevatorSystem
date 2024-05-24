@@ -1,0 +1,39 @@
+.simulation-container {
+    border: 3px;
+    border-style: ridge;
+    padding: 10px;
+    width: 1520px;
+    height: 690px;
+}
+
+.floor-container {
+    height: 665px;
+    width: 200px;
+}
+
+.floor-section {
+    height: 95px;
+    padding: 10px;
+    border-style: ridge;
+    border-left: 0px;
+    border-right: 0px;
+}
+
+.elevator {
+    height: 95px;
+    padding: 10px;
+}
+
+.elevator-container {
+    height: 665px;
+    width: 1300px;
+}
+
+.elevator-section {
+    width: 260px;
+    height: 100%;
+}
+
+.elevator-button {
+    font-size:x-large;
+}
