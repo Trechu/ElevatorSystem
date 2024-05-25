@@ -37,4 +37,16 @@
 
 .elevator-button {
     font-size:x-large;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.status-dial {
+    width: 25px;
+    height: 25px;
+    top: 27px;
+    left: 60px;
+    /* background-color: greenyellow; */
+    border-radius: 25px;
+    position: absolute;
 }

@@ -52,13 +52,13 @@
                     <React.Fragment>
                         <div className="floor-section mx-auto">
                             <div style={{height: "50%", width: "100%"}} className="text-center">
-                                <h3>Piętro {this.floor_number}</h3>
+                                <h3>Floor {this.floor_number}</h3>
                             </div>
                             <div style={{height: "50%", width: "100%"}} className="d-flex">
-                                <div style={{height: "100%", width: "50%"}} className="text-center rounded-pill bg-light elevator-button"
-                                onClick={() => main_system.pickup(this.floor_number, -1)}><i className="bi bi-arrow-down"></i></div>
-                                <div style={{height: "100%", width: "50%"}} className="text-center rounded-pill bg-light elevator-button"
-                                onClick={() => main_system.pickup(this.floor_number, 1)}><i className="bi bi-arrow-up"></i></div>
+                                <div style={{height: "100%", width: "50%"}} className="text-center rounded-pill bg-dark text-light elevator-button"
+                                onClick={() => sendRequest(this.floor_number)}><i className="bi bi-arrow-down"></i></div>
+                                <div style={{height: "100%", width: "50%"}} className="text-center rounded-pill bg-dark text-light elevator-button"
+                                onClick={() => sendRequest(this.floor_number)}><i className="bi bi-arrow-up"></i></div>
                             </div>
                         </div>
                     </React.Fragment>
@@ -81,7 +81,9 @@
                     <React.Fragment>
                         <div className="elevator-section" onClick={() => this.getElevatorNum()}>
                             <div className="elevator text-center" id={"elevator_" + this.elevator_number}>
+                                <div className="status-dial" id={"status_" + this.elevator_number}></div>
                                 <img src="./elevator.png"/>
+                                <div className="direction-dial"></div>
                             </div>
                         </div>
                     </React.Fragment>
