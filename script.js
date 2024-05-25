@@ -6,6 +6,14 @@ const elevator_count = 5;
 // For sanity reasons I assume that the building has 7 floors, however this should also work with more
 const number_of_floors = 7;
 
+const elevator_array = [];
+const available_elevators = new Map();
+
+const requests = [];
+const requestedFloors = new Map();
+
+document.querySelector("#sim-cont").style.visibility = 'hidden';
+
 class ElevatorSystem {
 
     // Pickup accepts two parameters: the floor from which the elevator was called, and the direction 
@@ -14,7 +22,7 @@ class ElevatorSystem {
     // The algorithm finds the first AVAILABLE elevator on the closest floor and dispatches it to
     // go to the designated location
     pickup(floor_number, direction){
-        if(available_elevators != 0){
+        if(available_elevators.size != 0){
             // Lets be honest, noone is gonna make a thousand story building ;)
             let current_closest = 1000;
             let best_elevator;
@@ -32,20 +40,25 @@ class ElevatorSystem {
         }  
     }
 
+    // This just simply takes the elevator and iterates it over the floors along the way
     async dispatch_elevator(elevator){
+        setElevatorStatus(elevator.id, -1);
         let starting_point = elevator.current_floor;
         let direction = starting_point - elevator.destination;
         for(let i = 0; i < Math.abs(starting_point - elevator.destination); i++){
             if(direction > 0){
-                await simulate_movement(2000);
+                moveElevatorElement(elevator.id, elevator.current_floor-1);
+                await simulateMovement(2000);
                 elevator.current_floor -= 1;
             } else if (direction < 0){
-                await simulate_movement(2000);
+                moveElevatorElement(elevator.id, elevator.current_floor+1);
+                await simulateMovement(2000);
                 elevator.current_floor += 1;
             }
         }
-        elevator_arrived(elevator, elevator.current_floor);
         elevator.destination = -1;
+        elevatorArrived(elevator, elevator.current_floor);
+        setElevatorStatus(elevator.id, 1);
     }
 
     status(){
@@ -66,6 +79,9 @@ class ElevatorSystem {
         return elevator_status;
     }
 }
+
+const main_system = new ElevatorSystem();
+
 
 class Elevator {
 
@@ -108,23 +124,77 @@ class Elevator {
     }
 }
 
-function elevator_arrived(elevator, floor){
+function elevatorArrived(elevator, floor){
     available_elevators.set(elevator, floor);
+    requestedFloors.delete(floor);
 }
 
-function simulate_movement(ms = 0) {
+function simulateMovement(ms = 0) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }  
 
-const elevator_array = [];
+// Show a text box with floor selection and remove the option for the buttons to be clikced
+function handleElevatorArrival(){
+    console.log(":3");
+}
 
-const available_elevators = new Map();
+async function moveElevatorElement(elevator_id, destination){
+    let div = document.querySelector(`#elevator_${elevator_id}`);
+    div.style.top = `${(6 - destination) * 95}px`;
+    div.style.transition = `all 2s ease-in-out`
+}
+
+function setElevatorStatus(elevator_id, condition){
+    let div = document.querySelector(`#status_${elevator_id}`);
+    if(condition < 0){
+        div.style.backgroundColor = "red";
+    } else {
+        div.style.backgroundColor = "greenyellow";
+    }
+}
+
+
 
 for(let i = 0; i < elevator_count; i++){
     elevator_array.push(new Elevator(i));
-    let tmp = Math.floor(Math.random() * number_of_floors);
-    elevator_array[i].current_floor = tmp;
-    elevator_arrived(elevator_array[i], tmp);
+    elevator_array[i].current_floor = 0;
+    elevatorArrived(elevator_array[i], 0);
 }
 
-const main_system = new ElevatorSystem();
+
+// Set all elevators at the default positon
+// For some reason the first animation just doesnt want to work, so this is a little cheat to get it working
+setTimeout(()=>{
+    for(let i = 0; i < elevator_count; i++){
+        moveElevatorElement(i,0);
+        setElevatorStatus(i,1);
+    }
+    document.querySelector(".loader").style.visibility = 'hidden';
+    document.querySelector("#sim-cont").style.visibility = 'visible';
+},1000);
+
+// Send a floor request
+function sendRequest(floor_number){
+    if(requestedFloors.get(floor_number)){
+        console.log("An elevator to the given floor has already been requested!");
+    } else {
+        requestedFloors.set(floor_number, 1);
+        requests.push(floor_number);
+    }
+}
+
+// This is the main part of the script, which tells the main system to listen for pickup requests
+async function listenForRequests(){
+    if(requests.length != 0){
+        if(available_elevators.size == 0){
+            console.log("All elevators are currently busy. Please wait a moment.");
+        } else {
+            let requested = requests.pop();
+            main_system.pickup(requested, 1);
+        }
+    }
+}
+
+setInterval(()=>{
+    listenForRequests();
+},500);

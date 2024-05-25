@@ -1,3 +1,21 @@
+.loader {
+    border: 16px solid #f3f3f3;
+    border-top: 16px solid #3498db;
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: spin 2s linear;
+    z-index: -1;
+    position: absolute;
+    left: 700px;
+    top: 300px;
+}
+  
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 .simulation-container {
     border: 3px;
     border-style: ridge;
@@ -22,6 +40,7 @@
 .elevator {
     height: 95px;
     padding: 10px;
+    position: relative;
 }
 
 .elevator-container {
@@ -36,4 +55,16 @@
 
 .elevator-button {
     font-size:x-large;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.status-dial {
+    width: 25px;
+    height: 25px;
+    top: 27px;
+    left: 60px;
+    /* background-color: greenyellow; */
+    border-radius: 25px;
+    position: absolute;
 }

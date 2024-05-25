@@ -21,8 +21,9 @@
     <div class="mx-auto text-center">
         <h1>Elevator Simulation</h1>
     </div>
+    <div class="loader"></div>
 
-    <div class="simulation-container mx-auto d-flex">
+    <div class="simulation-container mx-auto d-flex" id="sim-cont">
 
         <div class="floor-container" id="floor-root"></div>
 
@@ -34,8 +35,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
             crossorigin="anonymous"></script>
-
-    <script src="script.js"></script>
 
     <script type="text/babel">
 
@@ -52,13 +51,15 @@
             render() {
                 return (
                     <React.Fragment>
-                        <div className="floor-section mx-auto" onClick={() => this.getFloorNum()}>
+                        <div className="floor-section mx-auto">
                             <div style={{height: "50%", width: "100%"}} className="text-center">
-                                <h3>Piętro {this.floor_number}</h3>
+                                <h3>Floor {this.floor_number}</h3>
                             </div>
                             <div style={{height: "50%", width: "100%"}} className="d-flex">
-                                <div style={{height: "100%", width: "50%"}} className="text-center rounded-pill bg-light elevator-button"><i className="bi bi-arrow-down"></i></div>
-                                <div style={{height: "100%", width: "50%"}} className="text-center rounded-pill bg-light elevator-button"><i className="bi bi-arrow-up"></i></div>
+                                <div style={{height: "100%", width: "50%"}} className="text-center rounded-pill bg-dark text-light elevator-button"
+                                onClick={() => sendRequest(this.floor_number)}><i className="bi bi-arrow-down"></i></div>
+                                <div style={{height: "100%", width: "50%"}} className="text-center rounded-pill bg-dark text-light elevator-button"
+                                onClick={() => sendRequest(this.floor_number)}><i className="bi bi-arrow-up"></i></div>
                             </div>
                         </div>
                     </React.Fragment>
@@ -73,15 +74,17 @@
             }
 
             getElevatorNum(){
-                console.log(this.floor_number);
+                console.log(this.elevator_number);
             }
 
             render() {
                 return (
                     <React.Fragment>
                         <div className="elevator-section" onClick={() => this.getElevatorNum()}>
-                            <div className="elevator text-center">
+                            <div className="elevator text-center" id={"elevator_" + this.elevator_number}>
+                                <div className="status-dial" id={"status_" + this.elevator_number}></div>
                                 <img src="./elevator.png"/>
+                                <div className="direction-dial"></div>
                             </div>
                         </div>
                     </React.Fragment>
@@ -126,5 +129,6 @@
         )
 
     </script>
+    <script src="script.js"></script>
 </body>
 </html>
