@@ -35,8 +35,6 @@
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
             crossorigin="anonymous"></script>
 
-    <script src="script.js"></script>
-
     <script type="text/babel">
 
         class Floor extends React.Component {
@@ -52,13 +50,15 @@
             render() {
                 return (
                     <React.Fragment>
-                        <div className="floor-section mx-auto" onClick={() => this.getFloorNum()}>
+                        <div className="floor-section mx-auto">
                             <div style={{height: "50%", width: "100%"}} className="text-center">
                                 <h3>Piętro {this.floor_number}</h3>
                             </div>
                             <div style={{height: "50%", width: "100%"}} className="d-flex">
-                                <div style={{height: "100%", width: "50%"}} className="text-center rounded-pill bg-light elevator-button"><i className="bi bi-arrow-down"></i></div>
-                                <div style={{height: "100%", width: "50%"}} className="text-center rounded-pill bg-light elevator-button"><i className="bi bi-arrow-up"></i></div>
+                                <div style={{height: "100%", width: "50%"}} className="text-center rounded-pill bg-light elevator-button"
+                                onClick={() => main_system.pickup(this.floor_number, -1)}><i className="bi bi-arrow-down"></i></div>
+                                <div style={{height: "100%", width: "50%"}} className="text-center rounded-pill bg-light elevator-button"
+                                onClick={() => main_system.pickup(this.floor_number, 1)}><i className="bi bi-arrow-up"></i></div>
                             </div>
                         </div>
                     </React.Fragment>
@@ -73,14 +73,14 @@
             }
 
             getElevatorNum(){
-                console.log(this.floor_number);
+                console.log(this.elevator_number);
             }
 
             render() {
                 return (
                     <React.Fragment>
                         <div className="elevator-section" onClick={() => this.getElevatorNum()}>
-                            <div className="elevator text-center">
+                            <div className="elevator text-center" id={"elevator_" + this.elevator_number}>
                                 <img src="./elevator.png"/>
                             </div>
                         </div>
@@ -126,5 +126,6 @@
         )
 
     </script>
+    <script src="script.js"></script>
 </body>
 </html>

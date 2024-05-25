@@ -37,9 +37,11 @@ class ElevatorSystem {
         let direction = starting_point - elevator.destination;
         for(let i = 0; i < Math.abs(starting_point - elevator.destination); i++){
             if(direction > 0){
+                moveElevatorElement(elevator.id, elevator.current_floor-1);
                 await simulate_movement(2000);
                 elevator.current_floor -= 1;
             } else if (direction < 0){
+                moveElevatorElement(elevator.id, elevator.current_floor+1);
                 await simulate_movement(2000);
                 elevator.current_floor += 1;
             }
@@ -116,15 +118,31 @@ function simulate_movement(ms = 0) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }  
 
-const elevator_array = [];
+function handleElevatorArrival(){
+    console.log(":3");
+}
 
+async function moveElevatorElement(elevator_id, destination){
+    let div = document.querySelector(`#elevator_${elevator_id}`);
+    div.style.top = `${(6 - destination) * 95}px`;
+    div.style.transition = `all 2s ease-in-out`
+}
+
+const elevator_array = [];
 const available_elevators = new Map();
 
 for(let i = 0; i < elevator_count; i++){
     elevator_array.push(new Elevator(i));
-    let tmp = Math.floor(Math.random() * number_of_floors);
-    elevator_array[i].current_floor = tmp;
-    elevator_arrived(elevator_array[i], tmp);
+    elevator_array[i].current_floor = 0;
+    elevator_arrived(elevator_array[i], 0);
 }
 
 const main_system = new ElevatorSystem();
+
+setTimeout(()=>{
+    for(let i = 0; i < elevator_count; i++){
+        moveElevatorElement(i,0);
+    }
+    console.log(main_system.status());
+    console.log(available_elevators);
+},1000);
