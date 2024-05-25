@@ -12,6 +12,8 @@ const available_elevators = new Map();
 const requests = [];
 const requestedFloors = new Map();
 
+document.querySelector("#sim-cont").style.visibility = 'hidden';
+
 class ElevatorSystem {
 
     // Pickup accepts two parameters: the floor from which the elevator was called, and the direction 
@@ -167,6 +169,8 @@ setTimeout(()=>{
         moveElevatorElement(i,0);
         setElevatorStatus(i,1);
     }
+    document.querySelector(".loader").style.visibility = 'hidden';
+    document.querySelector("#sim-cont").style.visibility = 'visible';
 },1000);
 
 // Send a floor request
