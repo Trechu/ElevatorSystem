@@ -24,3 +24,11 @@ When the elevator finally arives it will patiently wait for you to select your d
 <b> In order to eliminate the need for the elevator to stop along its way to a selected floor, I assume that all of the elevators are single person only, so a situation where one elevator is waiting for an input while a second one is being called to the same floor is perfectly normal :) </b>
 
 When you input the desired floor, the elevator will *give you a lift* to the selected floor, where it will then wait for the next passanger or leave to process another elevator request from the queue.
+
+## 4. How many elevators can it operate?
+
+If you want to change the amount of elevators you can do so by changing two constants inside the code. 
+- `sheet.css` - Change `--number-of-elevators` to {desired_elevator_amount}px
+- `script.js` - Change `elevator_count` to {desired_elevator_amount}
+
+However, I don't advise to go above 16, as I haven't tested the simulation with higher numbers (although it should work fine).
