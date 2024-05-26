@@ -6,6 +6,11 @@ const elevator_count = 5;
 // For sanity reasons I assume that the building has 7 floors, however this should also work with more
 const number_of_floors = 7;
 
+const floor_array = [];
+for(let i = 0; i < number_of_floors; i++){
+    floor_array.push(i);
+}
+
 const elevator_array = [];
 const available_elevators = new Map();
 
@@ -62,7 +67,7 @@ class ElevatorSystem {
         elevator.destination = -1;
         elevatorArrived(elevator, elevator.current_floor);
         setElevatorStatus(elevator.id, 1);
-        
+
         toggleButtons(elevator.current_floor);
     }
 
@@ -172,8 +177,6 @@ function setElevatorStatus(elevator_id, condition){
     }
 }
 
-
-
 for(let i = 0; i < elevator_count; i++){
     elevator_array.push(new Elevator(i));
     elevator_array[i].current_floor = 0;
@@ -181,16 +184,6 @@ for(let i = 0; i < elevator_count; i++){
 }
 
 
-// Set all elevators at the default positon
-// For some reason the first animation just doesnt want to work, so this is a little cheat to get it working
-setTimeout(()=>{
-    for(let i = 0; i < elevator_count; i++){
-        moveElevatorElement(i,0);
-        setElevatorStatus(i,1);
-    }
-    document.querySelector(".loader").style.visibility = 'hidden';
-    document.querySelector("#sim-cont").style.visibility = 'visible';
-},1000);
 
 // Send a floor request
 function sendRequest(floor_number){
@@ -204,6 +197,15 @@ function sendRequest(floor_number){
     }
 }
 
+// Dispatch an elevator from inside
+function sendRequestFromElevator(floor_number, elevator_id){
+    available_elevators.delete(elevator_array[elevator_id]);
+    requestedFloors.set(floor_number, 1);
+    // toggleButtons(floor_number);
+    elevator_array[elevator_id].destination = floor_number;
+    main_system.dispatch_elevator(elevator_array[elevator_id]);
+}
+
 // This is the main part of the script, which tells the main system to listen for pickup requests
 async function listenForRequests(){
     if(requests.length != 0){
@@ -215,6 +217,18 @@ async function listenForRequests(){
         }
     }
 }
+
+
+// Set all elevators to the default positon
+// For some reason the first animation just doesnt want to work, so this is a little cheat to get it working
+setTimeout(()=>{
+    for(let i = 0; i < elevator_count; i++){
+        moveElevatorElement(i,0);
+        setElevatorStatus(i,1);
+    }
+    document.querySelector(".loader").style.visibility = 'hidden';
+    document.querySelector("#sim-cont").style.visibility = 'visible';
+},1000);
 
 setInterval(()=>{
     listenForRequests();
