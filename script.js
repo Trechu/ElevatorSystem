@@ -40,14 +40,15 @@ class ElevatorSystem {
 
             available_elevators.delete(best_elevator);
             best_elevator.destination = floor_number;
-            this.dispatch_elevator(best_elevator);
+            this.dispatch_elevator(best_elevator, 'outside');
         } else {
             // Do something while waiting for elevators
         }  
     }
 
     // This just simply takes the elevator and iterates it over the floors along the way
-    async dispatch_elevator(elevator){
+    async dispatch_elevator(elevator, mode){
+        // requestedFloors.delete(elevator.current_floor);
         setElevatorStatus(elevator.id, -1);
         let starting_point = elevator.current_floor;
         let direction = starting_point - elevator.destination;
@@ -67,8 +68,11 @@ class ElevatorSystem {
         elevator.destination = -1;
         elevatorArrived(elevator, elevator.current_floor);
         setElevatorStatus(elevator.id, 1);
-
-        toggleButtons(elevator.current_floor);
+        if(mode == 'outside'){
+            toggleButtons(elevator.current_floor);
+            document.querySelector(`#selector_${elevator.id}`).style.visibility = 'visible';
+            available_elevators.delete(elevator);
+        }
     }
 
     status(){
@@ -144,11 +148,6 @@ function simulateMovement(ms = 0) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }  
 
-// Show a text box with floor selection and remove the option for the buttons to be clikced
-function handleElevatorArrival(){
-    console.log(":3");
-}
-
 // Toggle elevator buttons
 function toggleButtons(id){
     let btn_up = document.querySelector(`#up_${id}`);
@@ -199,11 +198,12 @@ function sendRequest(floor_number){
 
 // Dispatch an elevator from inside
 function sendRequestFromElevator(floor_number, elevator_id){
+    document.querySelector(`#selector_${elevator_id}`).style.visibility = 'hidden';
     available_elevators.delete(elevator_array[elevator_id]);
-    requestedFloors.set(floor_number, 1);
+    // requestedFloors.set(floor_number, 1);
     // toggleButtons(floor_number);
     elevator_array[elevator_id].destination = floor_number;
-    main_system.dispatch_elevator(elevator_array[elevator_id]);
+    main_system.dispatch_elevator(elevator_array[elevator_id], 'inside');
 }
 
 // This is the main part of the script, which tells the main system to listen for pickup requests
@@ -225,6 +225,7 @@ setTimeout(()=>{
     for(let i = 0; i < elevator_count; i++){
         moveElevatorElement(i,0);
         setElevatorStatus(i,1);
+        document.querySelector(`#selector_${i}`).style.visibility = 'hidden';
     }
     document.querySelector(".loader").style.visibility = 'hidden';
     document.querySelector("#sim-cont").style.visibility = 'visible';

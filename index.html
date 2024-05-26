@@ -93,7 +93,7 @@
 
             render(){
                 return (
-                    <div className="selector-container d-flex flex-column">
+                    <div className="selector-container d-flex flex-column" id={"selector_" +this.elevator_number}>
                         <h4>Wybierz piętro</h4>    
                         <div className="row">       
                         {floor_array.toReversed().map((item) =>
