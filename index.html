@@ -21,7 +21,10 @@
     <div class="mx-auto text-center">
         <h1>Elevator Simulation</h1>
     </div>
-    <div class="loader"></div>
+    
+    <div class="loader-container d-flex">
+        <div class="loader"></div>
+    </div>
 
     <div class="simulation-container mx-auto d-flex" id="sim-cont">
 
@@ -44,10 +47,6 @@
                 this.floor_number = this.props.num;
             }
 
-            getFloorNum(){
-                console.log(this.floor_number);
-            }
-
             render() {
                 return (
                     <React.Fragment>
@@ -56,10 +55,10 @@
                                 <h3>Floor {this.floor_number}</h3>
                             </div>
                             <div style={{height: "50%", width: "100%"}} className="d-flex">
-                                <div style={{height: "100%", width: "50%"}} className="text-center rounded-pill bg-dark text-light elevator-button"
-                                onClick={() => sendRequest(this.floor_number)}><i className="bi bi-arrow-down"></i></div>
-                                <div style={{height: "100%", width: "50%"}} className="text-center rounded-pill bg-dark text-light elevator-button"
-                                onClick={() => sendRequest(this.floor_number)}><i className="bi bi-arrow-up"></i></div>
+                                <button id={"down_" + this.floor_number} style={{height: "100%", width: "50%"}} className="text-center rounded-pill bg-secondary text-light elevator-button"
+                                onClick={() => sendRequest(this.floor_number)}><i className="bi bi-arrow-down"></i></button>
+                                <button id={"up_" + this.floor_number} style={{height: "100%", width: "50%"}} className="text-center rounded-pill bg-secondary text-light elevator-button"
+                                onClick={() => sendRequest(this.floor_number)}><i className="bi bi-arrow-up"></i></button>
                             </div>
                         </div>
                     </React.Fragment>
@@ -73,21 +72,40 @@
                 this.elevator_number = this.props.num;
             }
 
-            getElevatorNum(){
-                console.log(this.elevator_number);
-            }
-
             render() {
                 return (
                     <React.Fragment>
-                        <div className="elevator-section" onClick={() => this.getElevatorNum()}>
+                        <div className="elevator-section">
                             <div className="elevator text-center" id={"elevator_" + this.elevator_number}>
                                 <div className="status-dial" id={"status_" + this.elevator_number}></div>
                                 <img src="./elevator.png"/>
                                 <div className="direction-dial"></div>
+                                <i className="bi bi-arrow-up" id={"arrow_up_" + this.elevator_number} style={{visibility: "hidden"}}/>
+                                <i className="bi bi-arrow-down"id={"arrow_down_" + this.elevator_number} style={{visibility: "hidden"}}/>
+                                < FloorSelector num={this.elevator_number}/>
                             </div>
                         </div>
                     </React.Fragment>
+                )
+            }
+        }
+
+        class FloorSelector extends React.Component {
+            constructor(props){
+                super(props);
+                this.elevator_number = this.props.num;
+            }
+
+            render(){
+                return (
+                    <div className="selector-container d-flex flex-column" id={"selector_" +this.elevator_number}>
+                        <h4>Wybierz piętro</h4>    
+                        <div className="row">       
+                        {floor_array.toReversed().map((item) =>
+                            <button className="btn column selector-button" key={item} onClick={() => sendRequestFromElevator(item, this.elevator_number)}>{item}</button>
+                        )}
+                        </div>
+                    </div>
                 )
             }
         }

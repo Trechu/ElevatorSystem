@@ -6,6 +6,11 @@ const elevator_count = 5;
 // For sanity reasons I assume that the building has 7 floors, however this should also work with more
 const number_of_floors = 7;
 
+const floor_array = [];
+for(let i = 0; i < number_of_floors; i++){
+    floor_array.push(i);
+}
+
 const elevator_array = [];
 const available_elevators = new Map();
 
@@ -32,19 +37,22 @@ class ElevatorSystem {
                     best_elevator = key;
                 } 
             }
+
             available_elevators.delete(best_elevator);
             best_elevator.destination = floor_number;
-            this.dispatch_elevator(best_elevator);
+            this.dispatch_elevator(best_elevator, 'outside');
         } else {
             // Do something while waiting for elevators
         }  
     }
 
     // This just simply takes the elevator and iterates it over the floors along the way
-    async dispatch_elevator(elevator){
+    async dispatch_elevator(elevator, mode){
+        // requestedFloors.delete(elevator.current_floor);
         setElevatorStatus(elevator.id, -1);
         let starting_point = elevator.current_floor;
         let direction = starting_point - elevator.destination;
+        toggleDirectionArrow(elevator.id, direction);
         for(let i = 0; i < Math.abs(starting_point - elevator.destination); i++){
             if(direction > 0){
                 moveElevatorElement(elevator.id, elevator.current_floor-1);
@@ -56,9 +64,16 @@ class ElevatorSystem {
                 elevator.current_floor += 1;
             }
         }
+
+        toggleDirectionArrow(elevator.id, direction);
         elevator.destination = -1;
         elevatorArrived(elevator, elevator.current_floor);
         setElevatorStatus(elevator.id, 1);
+        if(mode == 'outside'){
+            toggleButtons(elevator.current_floor);
+            document.querySelector(`#selector_${elevator.id}`).style.visibility = 'visible';
+            available_elevators.delete(elevator);
+        }
     }
 
     status(){
@@ -76,7 +91,18 @@ class ElevatorSystem {
         for(const elevator of elevator_array){
             elevator_status.push([elevator.id, elevator.current_floor, elevator.destination]);
         }
+
         return elevator_status;
+    }
+    async listenForRequests(){
+        if(requests.length != 0){
+            if(available_elevators.size == 0){
+                console.log("All elevators are currently busy. Please wait a moment.");
+            } else {
+                let requested = requests.pop();
+                main_system.pickup(requested, 1);
+            }
+        }
     }
 }
 
@@ -133,9 +159,35 @@ function simulateMovement(ms = 0) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }  
 
-// Show a text box with floor selection and remove the option for the buttons to be clikced
-function handleElevatorArrival(){
-    console.log(":3");
+function toggleDirectionArrow(elevator_id, direction){
+    if(direction > 0){
+        let arw = document.querySelector("#arrow_down_" + elevator_id);
+        if(arw.style.visibility == 'visible'){
+            arw.style.visibility = 'hidden';
+        } else {
+            arw.style.visibility = 'visible';
+        }
+    } else {
+        let arw = document.querySelector("#arrow_up_" + elevator_id);
+        if(arw.style.visibility == 'visible'){
+            arw.style.visibility = 'hidden';
+        } else {
+            arw.style.visibility = 'visible';
+        }
+    }
+}
+
+// Toggle elevator buttons
+function toggleButtons(id){
+    let btn_up = document.querySelector(`#up_${id}`);
+    let btn_down = document.querySelector(`#down_${id}`);
+    if(btn_up.disabled == false){
+        btn_up.disabled = true
+        btn_down.disabled = true
+    } else {
+        btn_up.disabled = false
+        btn_down.disabled = false
+    }
 }
 
 async function moveElevatorElement(elevator_id, destination){
@@ -153,8 +205,6 @@ function setElevatorStatus(elevator_id, condition){
     }
 }
 
-
-
 for(let i = 0; i < elevator_count; i++){
     elevator_array.push(new Elevator(i));
     elevator_array[i].current_floor = 0;
@@ -162,39 +212,45 @@ for(let i = 0; i < elevator_count; i++){
 }
 
 
-// Set all elevators at the default positon
-// For some reason the first animation just doesnt want to work, so this is a little cheat to get it working
-setTimeout(()=>{
-    for(let i = 0; i < elevator_count; i++){
-        moveElevatorElement(i,0);
-        setElevatorStatus(i,1);
-    }
-    document.querySelector(".loader").style.visibility = 'hidden';
-    document.querySelector("#sim-cont").style.visibility = 'visible';
-},1000);
 
 // Send a floor request
 function sendRequest(floor_number){
     if(requestedFloors.get(floor_number)){
         console.log("An elevator to the given floor has already been requested!");
     } else {
+        toggleButtons(floor_number);
+
         requestedFloors.set(floor_number, 1);
         requests.push(floor_number);
     }
 }
 
-// This is the main part of the script, which tells the main system to listen for pickup requests
-async function listenForRequests(){
-    if(requests.length != 0){
-        if(available_elevators.size == 0){
-            console.log("All elevators are currently busy. Please wait a moment.");
-        } else {
-            let requested = requests.pop();
-            main_system.pickup(requested, 1);
-        }
-    }
+// Dispatch an elevator from inside
+function sendRequestFromElevator(floor_number, elevator_id){
+    document.querySelector(`#selector_${elevator_id}`).style.visibility = 'hidden';
+    available_elevators.delete(elevator_array[elevator_id]);
+    // requestedFloors.set(floor_number, 1);
+    // toggleButtons(floor_number);
+    elevator_array[elevator_id].destination = floor_number;
+    main_system.dispatch_elevator(elevator_array[elevator_id], 'inside');
 }
 
+// This is the main part of the script, which tells the main system to listen for pickup requests
+
+
+
+// Set all elevators to the default positon
+// For some reason the first animation just doesnt want to work, so this is a little cheat to get it working
+setTimeout(()=>{
+    for(let i = 0; i < elevator_count; i++){
+        moveElevatorElement(i,0);
+        setElevatorStatus(i,1);
+        document.querySelector(`#selector_${i}`).style.visibility = 'hidden';
+    }
+    document.querySelector(".loader").style.visibility = 'hidden';
+    document.querySelector("#sim-cont").style.visibility = 'visible';
+},1000);
+
 setInterval(()=>{
-    listenForRequests();
+    main_system.listenForRequests();
 },500);
