@@ -32,6 +32,7 @@ class ElevatorSystem {
                     best_elevator = key;
                 } 
             }
+
             available_elevators.delete(best_elevator);
             best_elevator.destination = floor_number;
             this.dispatch_elevator(best_elevator);
@@ -45,6 +46,7 @@ class ElevatorSystem {
         setElevatorStatus(elevator.id, -1);
         let starting_point = elevator.current_floor;
         let direction = starting_point - elevator.destination;
+
         for(let i = 0; i < Math.abs(starting_point - elevator.destination); i++){
             if(direction > 0){
                 moveElevatorElement(elevator.id, elevator.current_floor-1);
@@ -56,9 +58,12 @@ class ElevatorSystem {
                 elevator.current_floor += 1;
             }
         }
+
         elevator.destination = -1;
         elevatorArrived(elevator, elevator.current_floor);
         setElevatorStatus(elevator.id, 1);
+        
+        toggleButtons(elevator.current_floor);
     }
 
     status(){
@@ -76,6 +81,7 @@ class ElevatorSystem {
         for(const elevator of elevator_array){
             elevator_status.push([elevator.id, elevator.current_floor, elevator.destination]);
         }
+
         return elevator_status;
     }
 }
@@ -138,6 +144,19 @@ function handleElevatorArrival(){
     console.log(":3");
 }
 
+// Toggle elevator buttons
+function toggleButtons(id){
+    let btn_up = document.querySelector(`#up_${id}`);
+    let btn_down = document.querySelector(`#down_${id}`);
+    if(btn_up.disabled == false){
+        btn_up.disabled = true
+        btn_down.disabled = true
+    } else {
+        btn_up.disabled = false
+        btn_down.disabled = false
+    }
+}
+
 async function moveElevatorElement(elevator_id, destination){
     let div = document.querySelector(`#elevator_${elevator_id}`);
     div.style.top = `${(6 - destination) * 95}px`;
@@ -178,6 +197,8 @@ function sendRequest(floor_number){
     if(requestedFloors.get(floor_number)){
         console.log("An elevator to the given floor has already been requested!");
     } else {
+        toggleButtons(floor_number);
+
         requestedFloors.set(floor_number, 1);
         requests.push(floor_number);
     }

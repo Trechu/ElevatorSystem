@@ -59,6 +59,10 @@
     margin-right: 5px;
 }
 
+.elevator-button:active:focus {
+    box-shadow: none !important;
+  }
+
 .status-dial {
     width: 25px;
     height: 25px;
