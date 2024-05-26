@@ -52,7 +52,7 @@ class ElevatorSystem {
         setElevatorStatus(elevator.id, -1);
         let starting_point = elevator.current_floor;
         let direction = starting_point - elevator.destination;
-
+        toggleDirectionArrow(elevator.id, direction);
         for(let i = 0; i < Math.abs(starting_point - elevator.destination); i++){
             if(direction > 0){
                 moveElevatorElement(elevator.id, elevator.current_floor-1);
@@ -65,6 +65,7 @@ class ElevatorSystem {
             }
         }
 
+        toggleDirectionArrow(elevator.id, direction);
         elevator.destination = -1;
         elevatorArrived(elevator, elevator.current_floor);
         setElevatorStatus(elevator.id, 1);
@@ -92,6 +93,16 @@ class ElevatorSystem {
         }
 
         return elevator_status;
+    }
+    async listenForRequests(){
+        if(requests.length != 0){
+            if(available_elevators.size == 0){
+                console.log("All elevators are currently busy. Please wait a moment.");
+            } else {
+                let requested = requests.pop();
+                main_system.pickup(requested, 1);
+            }
+        }
     }
 }
 
@@ -147,6 +158,24 @@ function elevatorArrived(elevator, floor){
 function simulateMovement(ms = 0) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }  
+
+function toggleDirectionArrow(elevator_id, direction){
+    if(direction > 0){
+        let arw = document.querySelector("#arrow_down_" + elevator_id);
+        if(arw.style.visibility == 'visible'){
+            arw.style.visibility = 'hidden';
+        } else {
+            arw.style.visibility = 'visible';
+        }
+    } else {
+        let arw = document.querySelector("#arrow_up_" + elevator_id);
+        if(arw.style.visibility == 'visible'){
+            arw.style.visibility = 'hidden';
+        } else {
+            arw.style.visibility = 'visible';
+        }
+    }
+}
 
 // Toggle elevator buttons
 function toggleButtons(id){
@@ -207,16 +236,7 @@ function sendRequestFromElevator(floor_number, elevator_id){
 }
 
 // This is the main part of the script, which tells the main system to listen for pickup requests
-async function listenForRequests(){
-    if(requests.length != 0){
-        if(available_elevators.size == 0){
-            console.log("All elevators are currently busy. Please wait a moment.");
-        } else {
-            let requested = requests.pop();
-            main_system.pickup(requested, 1);
-        }
-    }
-}
+
 
 
 // Set all elevators to the default positon
@@ -232,5 +252,5 @@ setTimeout(()=>{
 },1000);
 
 setInterval(()=>{
-    listenForRequests();
+    main_system.listenForRequests();
 },500);
